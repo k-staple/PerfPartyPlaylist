@@ -6,8 +6,10 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <unordered_map>
 using namespace std;
 
+#define streq(a, b) (a.compare(b)==0)
 
 struct song {
     string genre;
@@ -23,6 +25,7 @@ struct song {
 struct BST{
     song* root;
     void insert(song *);
+    void findFav(song * root);
 };
 
 struct person {
@@ -43,13 +46,29 @@ void BST::insert(song * newSong) {
     song * curr = root;
 
     // Inserts in the opposite direction of a BST
+    song * prev = curr;
+    bool wentLeft=0;
 
     while (curr != nullptr) {
-        if (newSong->numPlays > curr->numPlays) curr = curr->left;
-        else curr = curr->right;
+        prev= curr;
+        if (newSong->numPlays > curr->numPlays) {
+ 		curr = curr->left;
+		wentLeft= 1;
+	}
+        else {
+		curr = curr->right;
+		wentLeft=0;
+ 	}
+        
     }
+  
+    curr = new song{newSong->genre, newSong->title, newSong->album, newSong->artist, 
+        newSong->numPlays, newSong->length, newSong->left, newSong->right};
+    if (wentLeft) prev->left= curr;
+    else prev->right= curr;
 
-    curr = newSong; 
+    return;
+
 }
 
 
@@ -60,7 +79,15 @@ void in_order_traverse(song * root) {
 
     if (root == nullptr) return;
     in_order_traverse(root->left);
-    cout << root->numPlays << endl;
+    cout << root->title << " " << root-> numPlays <<  endl; //<< (root->left)->title
+    in_order_traverse(root->right);
+}
+
+void findFav(song * root) {
+
+    if (root == nullptr) return;
+    in_order_traverse(root->left);
+    	
     in_order_traverse(root->right);
 }
 
@@ -71,8 +98,9 @@ int main (int argc, char** argv){
 
     //-------------------Setup Number of people/ songs and build each person's tree
     int numPeople, partyLength;
-    vector<person*> musicGurus; //vector of pointers to people that will loop through when playing songs; build songs
-
+    vector<person> musicGurus; //vector of pointers to people that will loop through when playing songs; build songs
+    unordered_map <string, int> genreCount;
+    int playsCounterForRand;
 
     cout << "How many people are contributing songs?" << endl;
     cin >> numPeople;
@@ -83,7 +111,7 @@ int main (int argc, char** argv){
         sample.totalPlays = 0;
         sample.tree.root = NULL;
 
-        musicGurus.push_back(&sample);
+        musicGurus.push_back(sample);
     }
 
 
@@ -96,7 +124,7 @@ int main (int argc, char** argv){
     int num_songs, song_time, song_plays;
     string name, time, artist, album, plays, genre;
 
-    cout << "How many songs will you have? " << endl;
+    cout << "How many total songs will you have? " << endl;
     cin >> num_songs;
     int songPer= num_songs/numPeople;
 
@@ -124,13 +152,13 @@ int main (int argc, char** argv){
         
         song* check= &newSong;
         //cout << check->genre << endl;
-
-        musicGurus[i/songPer]->tree.insert(&newSong); // I believe this line is what we need
+        genreCount[newSong.genre] = genreCount[newSong.genre]+ 1;
+        musicGurus[i/songPer].tree.insert(&newSong); // I believe this line is what we need
 
     }
 
     for (int i = 0; i < musicGurus.size(); i++){
-        in_order_traverse(musicGurus[i]->tree.root);
+        in_order_traverse(musicGurus[i].tree.root);
     }
 
 
