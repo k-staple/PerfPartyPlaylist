@@ -6,7 +6,11 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <stdlib.h>
+#include <time.h>
 #include <unordered_map>
+#include <stdio.h>
+
 using namespace std;
 
 #define streq(a, b) (a.compare(b)==0)
@@ -40,7 +44,7 @@ struct person {
 void BST::insert(song * newSong) {
     if (root == nullptr) {
         root = new song{newSong->genre, newSong->title, newSong->album, newSong->artist, 
-        newSong->numPlays, newSong->length, newSong->left, newSong->right};
+            newSong->numPlays, newSong->length, newSong->left, newSong->right};
         return;
     }
     song * curr = root;
@@ -52,16 +56,16 @@ void BST::insert(song * newSong) {
     while (curr != nullptr) {
         prev= curr;
         if (newSong->numPlays > curr->numPlays) {
- 		curr = curr->left;
-		wentLeft= 1;
-	}
+            curr = curr->left;
+            wentLeft= 1;
+        }
         else {
-		curr = curr->right;
-		wentLeft=0;
- 	}
-        
+            curr = curr->right;
+            wentLeft=0;
+        }
+
     }
-  
+
     curr = new song{newSong->genre, newSong->title, newSong->album, newSong->artist, 
         newSong->numPlays, newSong->length, newSong->left, newSong->right};
     if (wentLeft) prev->left= curr;
@@ -83,12 +87,21 @@ void in_order_traverse(song * root) {
     in_order_traverse(root->right);
 }
 
-void findFav(song * root) {
-
+void findFav(song * root, int * currNum, int randNum, int * flag, song * foundSong) {
+    //cout << "Inside find fav" << endl;
     if (root == nullptr) return;
-    in_order_traverse(root->left);
-    	
-    in_order_traverse(root->right);
+
+    if (*flag == 0) findFav(root->left, currNum, randNum,flag, foundSong);
+    *currNum += root->numPlays;
+    //cout << "currNum " << *currNum << endl;
+    if (*currNum >= randNum && (*flag==0)) {
+        cout << "Now playing: " << root->title << " with " << root->numPlays << " plays, and time: " <<  
+        root->length << endl;
+        foundSong->length = root->length;
+        *flag = 1; 
+        return;
+    }
+    if (*flag == 0) findFav(root->right, currNum, randNum, flag, foundSong);
 }
 
 
@@ -104,8 +117,10 @@ int main (int argc, char** argv){
 
     cout << "How many people are contributing songs?" << endl;
     cin >> numPeople;
-    cout << "How long is your party?" << endl;
+    cout << "How long is your party (in minutes)?" << endl;
     cin >> partyLength;
+    partyLength *= 60;
+
     for (int i=0; i< numPeople; i++){
         person sample;
         sample.totalPlays = 0;
@@ -128,10 +143,10 @@ int main (int argc, char** argv){
     cin >> num_songs;
     int songPer= num_songs/numPeople;
 
-    
 
 
-    for (int i = 0; i < num_songs; i++) {
+
+    for (int i = 0; i < num_songs - num_songs % songPer; i++) {
         song newSong;
         getline(ifs, newSong.title, ',');
         getline(ifs, time, ',');
@@ -149,18 +164,46 @@ int main (int argc, char** argv){
         newSong.numPlays= song_plays;
         newSong.left= NULL;
         newSong.right= NULL;
-        
-        song* check= &newSong;
-        //cout << check->genre << endl;
         genreCount[newSong.genre] = genreCount[newSong.genre]+ 1;
         musicGurus[i/songPer].tree.insert(&newSong); // I believe this line is what we need
-
+        musicGurus[i/songPer].totalPlays += newSong.numPlays;
     }
 
     for (int i = 0; i < musicGurus.size(); i++){
         in_order_traverse(musicGurus[i].tree.root);
+        //cout << "plays: " << musicGurus[i].totalPlays << endl;
     }
 
+
+    // generate random #
+
+    //srand((int)time(NULL)) % 100;
+
+    //% musicGurus[0].totalPlays;
+    srand(1);
+
+    int timeElapsed = 0, randNum, total, found, index = 0;
+    song foundSong;
+    foundSong.length=0;
+
+    while (timeElapsed < partyLength) {
+
+        randNum = rand() % musicGurus[index].totalPlays;
+        total = 0;
+        found = 0;
+        //cout << "rand num " << randNum << endl; 
+        //cout << "rand num " << randNum << endl;
+        //cout << "total plays for this person " << musicGurus[index].totalPlays << endl;
+
+        //&foundSong = NULL;
+        findFav(musicGurus[index].tree.root,&total,randNum, &found, &foundSong);
+        timeElapsed += foundSong.length;
+        cout << "Party time elapsed: " << timeElapsed/60 << " minutes and " << timeElapsed %60 << 
+        " seconds " <<  endl;;
+        index++;
+        if (index == numPeople) index = 0;
+
+    }
 
     //read in and update array
     //for 1/3 songs, read in
@@ -175,11 +218,6 @@ int main (int argc, char** argv){
 
 
 
-
-
-
-
-
     return 0;
-
 }
+
