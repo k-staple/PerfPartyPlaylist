@@ -191,22 +191,19 @@ int main (int argc, char** argv){
 
 	srand (0); //http://en.cppreference.com/w/cpp/numeric/random/srand
 
-	int timeElapsed = 0, randNum, total=0, found, index = 0;
+	int timeElapsed = 0, randNum, total, found, index = 0;
 	int favSongsPlayed=0, wouldHaveBeenTime=0;
 	int totalingSongs=0;
 	
-	queue <song> unpopular;
+		queue <song> unpopular;
 	queue <song> popular;
 	vector <song> playlist;
 
 
 
 while (timeElapsed <= partyLength){
-	randNum= rand() % musicGurus[index].totalPlays; 
-	total =0;
-	found =0;
 	song foundSong;
-	foundSong.title="peace";
+	foundSong.title="";
 	foundSong.length=0;
 	foundSong.artist="";
 	foundSong.album="";

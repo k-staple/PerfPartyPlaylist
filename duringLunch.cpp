@@ -97,7 +97,14 @@ void findFav(song * root, int * currNum, int randNum, int * flag, song * foundSo
 	if (*currNum >= randNum && (*flag==0)) {
 		cout << "	Found fav: " << root->title << " with " << root->numPlays << " plays, and time: " <<  
 			root->length << root->genre<< endl;
+		foundSong-> genre= root->genre;
 		foundSong->length = root->length;
+		foundSong->title= root-> title;
+		foundSong->numPlays= root-> numPlays;
+		foundSong-> album= root-> album;
+		foundSong-> artist= root-> artist;
+		foundSong-> left= root-> left;
+		foundSong -> right = root-> right;
 		*flag = 1; 
 		return;
 	}
@@ -178,7 +185,7 @@ int main (int argc, char** argv){
 		if (it-> second > compareCount){
 			compareCount = it->second;
 			favGenre= it->first;
-			cout << "fav Genre " << favGenre << " " << it->second << endl;
+			cout << "\nfav Genre \n" << favGenre << " " << it->second << endl;
 		}
 	}
 
@@ -191,69 +198,132 @@ int main (int argc, char** argv){
 
 	srand (0); //http://en.cppreference.com/w/cpp/numeric/random/srand
 
-	int timeElapsed = 0, randNum, total=0, found, index = 0;
+	int timeElapsed = 0, randNum, total, found, index = 0;
 	int favSongsPlayed=0, wouldHaveBeenTime=0;
 	int totalingSongs=0;
-	
+	song foundSong, unpopularSong;
+	foundSong.length=0;
 	queue <song> unpopular;
 	queue <song> popular;
 	vector <song> playlist;
 
 
+	while (timeElapsed < partyLength) {
 
-while (timeElapsed <= partyLength){
-	randNum= rand() % musicGurus[index].totalPlays; 
-	total =0;
-	found =0;
-	song foundSong;
-	foundSong.title="peace";
-	foundSong.length=0;
-	foundSong.artist="";
-	foundSong.album="";
-	foundSong.numPlays=0;
-	foundSong.genre="";
-	foundSong.left=NULL;
-	foundSong.right=NULL;
-	findFav(musicGurus[index].tree.root,&total,randNum, &found, &foundSong);
-	totalingSongs++;
-	cout << "tot numSI " << totalingSongs << "  " << numSongsInserted << " " << foundSong.title <<  endl;
+		randNum = rand() % musicGurus[index].totalPlays;
+		total = 0;
+		found = 0;
+		totalingSongs++;
+		//cout << "rand num " << randNum << endl; 
+		//cout << "rand num " << randNum << endl;
+		//cout << "total plays for this person " << musicGurus[index].totalPlays << endl;
 
-	if (totalingSongs <= numSongsInserted){
-		if (favSongsPlayed == 2 && !unpopular.empty() ){
-			song unpopularSong= unpopular.front();
-			timeElapsed += unpopularSong.length;
-			cout << "1 Party time elapsed: " << timeElapsed/60 << " minutes and " << timeElapsed %60 << " seconds " << "title genre " << unpopularSong.title << "  " << unpopularSong.genre <<  endl;
-			unpopular.pop();
-			favSongsPlayed =0;
-		}
-		if (foundSong.genre == favGenre){
+		//play two songs from popular genre right away followed by unpopular genre song, if exists. If have already played 2 from favorite genre, play 1 unpopular; Regardless, do something with the foundSong, whether that's play it right away, add to unpopular queue, or add to popular queue
+		if (totalingSongs <= numSongsInserted){
+			findFav(musicGurus[index].tree.root,&total,randNum, &found, &foundSong);
 			timeElapsed += foundSong.length;
-			cout << "2 Party time elapsed: " << timeElapsed/60 << " minutes and " << timeElapsed %60 << " seconds " << "title genre " << foundSong.title << "  " << foundSong.genre << endl;
-			favSongsPlayed++;
-		} else {
-			unpopular.push(foundSong);
+			cout << "_" << favGenre << "_  _" << foundSong.genre << "_ " << endl;
+			if (favGenre.compare(0,3,foundSong.genre,0,3)==0){
+				popular.push(foundSong);
+				cout << "pushed popular " << foundSong.title << endl;
+			} else {
+				unpopular.push(foundSong);
+				cout << "pushed unpopular" << foundSong.title << endl;
+			}
+
+			cout << "time el" << timeElapsed << endl;
+			index++;
+			if (index == numPeople) index = 0;
+
+
 		}
+		cout << "after time el" << endl;
+
 	}
-	else {	//have accessed number of songs put in so need to play from the queue to fill up to the time
-		song unpopularSong= unpopular.front();
-		timeElapsed += unpopularSong.length;
-		cout << "3 Party time elapsed: " << timeElapsed/60 << " minutes and " << timeElapsed %60 << " seconds " << "title genre " << unpopularSong.title << "  " << unpopularSong.genre <<  endl;
-		unpopular.pop();	
+	int timeElapsedRuntime=0;
+
+	song popularSong;
+	int backupIndex=0;
+	while (timeElapsedRuntime <= partyLength){
+		song popularSong;
+		song unpopularSong;
+		if (!popular.empty()){
+			if (favSongsPlayed == 2 && !unpopular.empty() ){
+				unpopularSong= unpopular.front();
+				playlist.push_back(unpopularSong);
+				timeElapsedRuntime += unpopularSong.length;
+				cout << "	first Party time elapsed: " << timeElapsedRuntime/60 << " minutes and " << timeElapsedRuntime %60 << " seconds " << "title genre " << unpopularSong.title << "  " << unpopularSong.genre <<  endl;
+				unpopular.pop();
+				favSongsPlayed =0;
+				
+			}
+			popularSong= popular.front();
+			timeElapsedRuntime += popularSong.length;
+			cout << "	popular Party time elapsed: " << timeElapsedRuntime/60 << " minutes and " << timeElapsedRuntime %60 << " seconds " << "title genre " << popularSong.title << "  " << popularSong.genre <<  endl;
+			playlist.push_back(popularSong);
+			
+			favSongsPlayed++;
+			popular.pop();
+
+
+		}
+		else if (!unpopular.empty()){
+			unpopularSong= unpopular.front();
+			timeElapsedRuntime += unpopularSong.length;
+
+			cout << "	 second Party time elapsed: " << timeElapsedRuntime/60 << " minutes and " << timeElapsedRuntime %60 << " seconds " << "title genre " << unpopularSong.title << "  " << unpopularSong.genre <<  endl;
+			playlist.push_back(unpopularSong);
+			
+			unpopular.pop();
+		} else {
+			cout << "Party time elapsed: " << timeElapsedRuntime/60 << " minutes and " << timeElapsedRuntime %60 << " seconds " << "title genre 			" << playlist[backupIndex].title << "  " <<playlist[backupIndex].genre <<  endl;
+			backupIndex++;
+			timeElapsedRuntime+= playlist[backupIndex].length;
+			if (backupIndex == num_songs){
+				backupIndex=0;
+			}
+		}
+
 	}
-
-	index++;
-	if (index == numPeople) index = 0;
+	/*
 
 
-}
+	   while (timeElapsed <= partyLength){
+	   findFav(musicGurus[index].tree.root,&total,randNum, &found, &foundSong);
+	   totalingSongs++;
 
-//read in and update array
-//for 1/3 songs, read in
-//create song
-//push to musicGurus[i]->tree[treeIndex]
+	   if (totalingSongs <= numSongsInserted){
+	   if (favSongsPlayed == 2 && !unpopular.empty() ){
+	   unpopularSong= unpopular.front();
+	   timeElapsed += unpopularSong.length;
+	   cout << "Party time elapsed: " << timeElapsed/60 << " minutes and " << timeElapsed %60 << " seconds " << "title genre " << unpopularSong.title << "  " << unpopularSong.genre <<  endl;
+	   unpopular.pop();
+	   favSongsPlayed =0;
+	   }
+	   if (foundSong.genre == favGenre){
+	   timeElapsed += foundSong.length;
+	   cout << "Party time elapsed: " << timeElapsed/60 << " minutes and " << timeElapsed %60 << " seconds " << "title genre " << foundSong.title << "  " << foundSong.genre << endl;
+	   favSongsPlayed++;
+	   } else {
+	   unpopular.push(foundSong);
+	   }
+	   }
+	   else {	//have accessed number of songs put in so need to play from the queue to fill up to the time
+	   unpopularSong= unpopular.front();
+	   timeElapsed += unpopularSong.length;
+	   cout << "Party time elapsed: " << timeElapsed/60 << " minutes and " << timeElapsed %60 << " seconds " << "title genre " << unpopularSong.title << "  " << unpopularSong.genre <<  endl;
+	   unpopular.pop();	
+	   }
+
+	   }
+	   */
+	//read in and update array
+	//for 1/3 songs, read in
+	//create song
+	//push to musicGurus[i]->tree[treeIndex]
 
 
-//generate popular and unpopular queue. If a song's genre is the favorite genre, add it to the popular queue right away. 
-return 0;
+	//generate popular and unpopular queue. If a song's genre is the favorite genre, add it to the popular queue right away. 
+	return 0;
 }
 
