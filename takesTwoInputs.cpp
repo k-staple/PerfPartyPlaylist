@@ -153,7 +153,7 @@ int main (int argc, char** argv){
     int num_songs, song_time, song_plays;
     string name, time, artist, album, plays, genre;
 
-    cout << "How many total songs will you have? " << endl;
+    cout << "How many total songs will you have?" << endl;
     cin >> num_songs;
     int songPer= num_songs/numPeople;
 
@@ -314,7 +314,7 @@ int main (int argc, char** argv){
         }
 
     }
-    /*
+   
        while (timeElapsed <= partyLength){
        findFav(musicGurus[index].tree.root,&total,randNum, &found, &foundSong);
        totalingSongs++;
@@ -341,7 +341,7 @@ int main (int argc, char** argv){
        unpopular.pop(); 
        }
        }
-       */
+       
     //read in and update array
     //for 1/3 songs, read in
     //create song
@@ -350,7 +350,6 @@ int main (int argc, char** argv){
     for (int a = 0; a < musicGurus.size(); a++) {
         delete_tree(musicGurus[a].tree.root);
     }
-
 
     //generate popular and unpopular queue. If a song's genre is the favorite genre, add it to the popular queue right away. 
     return 0;
