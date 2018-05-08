@@ -267,7 +267,7 @@ int main (int argc, char** argv){
             }
             popularSong= popular.front();
             timeElapsedRuntime += popularSong.length;
-            cout << popularSong.title << ", " << timeElapsedRuntime/60 << ":" << timeElapsedRuntime %60  <<  endl;
+            cout << popularSong.title << "," << timeElapsedRuntime/60 << ":" << timeElapsedRuntime %60  <<  endl;
             playlist.push_back(popularSong);
 
             favSongsPlayed++;
@@ -278,12 +278,12 @@ int main (int argc, char** argv){
         else if (!unpopular.empty()){
             unpopularSong= unpopular.front();
             timeElapsedRuntime += unpopularSong.length;
-cout << unpopularSong.title << ", " << timeElapsedRuntime/60 << ":" << timeElapsedRuntime %60  <<  endl;
+cout << unpopularSong.title << "," << timeElapsedRuntime/60 << ":" << timeElapsedRuntime %60  <<  endl;
                         playlist.push_back(unpopularSong);
 
             unpopular.pop();
         } else {
-            cout << playlist[backupIndex].title << ", " << timeElapsedRuntime/60 << ":" << timeElapsedRuntime %60 <<  endl;
+            cout << playlist[backupIndex].title << "," << timeElapsedRuntime/60 << ":" << timeElapsedRuntime %60 <<  endl;
             backupIndex++;
             timeElapsedRuntime+= playlist[backupIndex].length;
             if (backupIndex == num_songs){
