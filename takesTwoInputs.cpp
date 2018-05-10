@@ -131,7 +131,7 @@ int main (int argc, char** argv){
 
     //cout << "How many people are contributing songs?" << endl;
     //cin >> numPeople;
-    cout << "How long is your party (in minutes)?" << endl;
+    //cout << "How long is your party (in minutes)?" << endl;
     cin >> partyLength;
     partyLength *= 60;
 
@@ -153,7 +153,7 @@ int main (int argc, char** argv){
     int num_songs, song_time, song_plays;
     string name, time, artist, album, plays, genre;
 
-    cout << "How many total songs will you have?" << endl;
+    //cout << "How many total songs will you have?" << endl;
     cin >> num_songs;
     int songPer= num_songs/numPeople;
 
@@ -312,36 +312,7 @@ int main (int argc, char** argv){
                 backupIndex=0;
             }
         }
-
     }
-   
-       while (timeElapsed <= partyLength){
-       findFav(musicGurus[index].tree.root,&total,randNum, &found, &foundSong);
-       totalingSongs++;
-       if (totalingSongs <= numSongsInserted){
-       if (favSongsPlayed == 2 && !unpopular.empty() ){
-       unpopularSong= unpopular.front();
-       timeElapsed += unpopularSong.length;
-       cout << "Party time elapsed: " << timeElapsed/60 << " minutes and " << timeElapsed %60 << " seconds " << "title genre " << unpopularSong.title << "  " << unpopularSong.genre <<  endl;
-       unpopular.pop();
-       favSongsPlayed =0;
-       }
-       if (foundSong.genre == favGenre){
-       timeElapsed += foundSong.length;
-       cout << "Party time elapsed: " << timeElapsed/60 << " minutes and " << timeElapsed %60 << " seconds " << "title genre " << foundSong.title << "  " << foundSong.genre << endl;
-       favSongsPlayed++;
-       } else {
-       unpopular.push(foundSong);
-       }
-       }
-       else {   //have accessed number of songs put in so need to play from the queue to fill up to the time
-       unpopularSong= unpopular.front();
-       timeElapsed += unpopularSong.length;
-       cout << "Party time elapsed: " << timeElapsed/60 << " minutes and " << timeElapsed %60 << " seconds " << "title genre " << unpopularSong.title << "  " << unpopularSong.genre <<  endl;
-       unpopular.pop(); 
-       }
-       }
-       
     //read in and update array
     //for 1/3 songs, read in
     //create song
