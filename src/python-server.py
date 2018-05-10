@@ -10,10 +10,11 @@ import mimetypes
 import os
 import subprocess
 import sys
+#from string import string
 
 # Constants
 
-WWW_PORT = 9001 #port number
+WWW_PORT = 9008 #port number
 WWW_ROOT = os.path.abspath('../www')
 
 # Utility Functions
@@ -54,9 +55,12 @@ class WWWHandler(BaseHTTPRequestHandler):
         self.send_header('Content-type', 'application/json')
         self.end_headers()
 
-        p = subprocess.Popen(['./during'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
-        d = [map(int, line.split(',')) for line in p.communicate(data)[0].splitlines()] #split on comma
-        json.dump({'path': d[1:], 'cost': d[0]}, self.wfile)
+        p = subprocess.Popen(['./testing2'], stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        d = [map(str, line.split(',')) for line in p.communicate(data)[0].splitlines()]
+        json.dump({'path': d[:]}, self.wfile)
+ 
+ # d = [map(string, line.split(',')) for line in p.communicate(data)[0].splitlines()] #split on comma
+        #json.dump({'songs': d[:]}, self.wfile)
 
 # Usage
 
